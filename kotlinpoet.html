@@ -1,0 +1,1829 @@
+<!DOCTYPE html>
+<!--
+  Copyright 2010 Google Inc.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+  Original slides: Marcin Wichary (mwichary@google.com)
+  Modifications: Ernest Delgado (ernestd@google.com)
+                 Alex Russell (slightlyoff@chromium.org)
+
+  landslide modifications: Adam Zapletal (adamzap@gmail.com)
+                           Nicolas Perriault (nperriault@gmail.com)
+-->
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Kotlin code generation with kotlinpoet</title>
+    <!-- Styles -->
+    
+    <style type="text/css" media="print">
+      /*
+Letter 612 x 792
+A4     498 x 750
+*/
+
+/***************************************************************************/
+/* The bits that you probably want to override! */
+body {
+  font-size: 20pt;
+  font-family: "Helvetica", "Arial", "Liberation Sans", sans-serif;
+  color: black;
+  background-color: #fff; /* Colour outside of slide */
+}
+
+div.presentation, div.slide {
+  background-color: white; /* colour of the slide */
+}
+
+div.slide h1, div.slide h2, div.slide h3, div.slide h4, div.slide h5, div.slide h6 {
+  color: navy;
+  font-weight: normal;
+}
+
+div.slide h3, div.slide h4, div.slide h5, div.slide h6 {
+  margin-bottom: 6px;
+}
+
+div.slide h3 + p, div.slide h4 + p, div.slide h5 + p, div.slide h6 + p {
+  margin-top: 6px;
+}
+
+pre {
+  font-size: 12pt;
+  font-family: Monaco, Courier, monospace;
+}
+
+li {
+  line-height: 1.5em;
+  margin-left: 10pt;
+  /*padding: 10px 0*/;
+}
+
+li ul, li ul li {
+  margin-top: 0;
+}
+
+table {
+  margin-top: 6pt;
+  border-collapse: collapse;
+  width: 100%;
+}
+table th {
+  text-align: left;
+  border-bottom: 1px solid #666;
+}
+table td, table th {
+  padding-left:   10px;
+  padding-right:  10px;
+  padding-top:    4px;
+  padding-bottom: 4px;
+}
+tr > td:first-child, tr > th:first-child {
+  padding-left: 0;
+}
+
+/* .notes are displayed when you press '2' */
+.notes {
+  color: white;
+  background: #777;
+  opacity:0.90;
+}
+
+/* A title slide is a single header */
+.slide header:only-child h1 {
+  font-weight: bold;
+  font-size: 36pt;
+}
+
+/* Source and page number */
+aside.source, aside.page_number {
+  font-size: 14pt;
+}
+
+/* Quote and blockquote */
+blockquote          { text-indent: -1ex; margin-bottom: 10px;}
+blockquote *        { quotes: none; }
+blockquote p:before { content: '\201C'; }
+blockquote p:after  { content: '\201D'; }
+blockquote p        { margin:0; padding:0; }
+blockquote q:before { content: '\2018'; }
+blockquote q:after  { content: '\2019'; }
+.cite { margin:0; text-align:right; margin-right: 40px;}
+
+/***************************************************************************/
+/* Specific clases for use with the .fx: macro */
+
+/* smaller and larger */
+.smaller section {
+  font-size: 18pt;
+}
+
+.smaller div h1 {
+  font-size: 40pt;
+}
+
+.smaller section pre {
+  font-size: 10pt;
+}
+
+.larger section {
+  font-size: 22pt;
+}
+
+.larger div h1 {
+  font-size: 40pt;
+}
+
+.larger section pre {
+  font-size: 14pt;
+}
+
+/* titleslide: displaying a title(h1) and subtitle(h2) on the same slide */
+div.titleslide { text-align: center; }
+div.titleslide h1 { padding-top: 50pt; font-size: 60pt; font-weight: bold;}
+
+/* imageslide: covering a whole slide with an image */
+div.slides div.imageslide {margin: 0; width: 750pt; height: 460pt; overflow: hidden}
+div.imageslide img { 
+  position: relative; 
+  /*top: -144pt;*/
+  /*top: -460pt;*/
+  /*left: -10pt; */
+  top: -138pt;
+  left: -10pt;
+  width: 750pt;
+  height: 460pt;
+  max-width: 750pt !important; 
+  max-height: 460pt !important; 
+  z-index: 0; 
+}
+
+div.imageslide h1 { position: relative; z-index: 3 !important; /*left: 40px; top: -70pt; */}
+
+/* black and white header for use with imageslide */
+div.whiteheading h1 {color: #fffffe !important;}
+div.blackheading h1 {color: black !important;}
+
+/***************************************************************************/
+/* Syntax highlighting is by Pygments - select via config file */
+.lineno {color: #aaa; }  /* Line numbers */
+
+
+
+/***************************************************************************/
+/* The structure - You shouldn't need to change anything from here on down */
+body {
+  /*padding : 70pt;*/
+  margin  : 0;
+  overflow: hidden;
+}
+
+div.presentation, div.slides {
+    transform: scale(1),
+    -ms-transform: scale(1),
+    -moz-transform: scale(1),
+    -webkit-transform: scale(1),
+    -o-transform: scale(1),
+}
+
+/*div.slides {
+  width: 754pt !important;
+  height: 502pt !important;
+}*/
+
+div.slide {
+  display: block !important;
+  width: 740pt !important;
+  height: 460pt !important;
+  border: 2pt solid #ddd;
+/*  width      : 100%;
+  height     : 100%;*/
+  overflow   : hidden;
+  page-break-after: always;
+}
+
+div.slide div.inner {
+  width: 750pt !important;
+  height: 460pt !important;
+  margin: auto;
+  display: table-cell;
+  padding: 10pt;
+}
+
+
+/* A title slide is a single header */
+.slide header:only-child {
+  display: table;
+}
+
+.slide header:only-child h1 {
+  width: 750pt !important;
+  height: 460pt !important;
+  text-align    : center;
+  display       : table-cell;
+  vertical-align: middle;
+}
+
+/*.slide header:only-child h1 {
+  line-height: 180%;
+  text-align: center;
+  display: table-cell;
+  vertical-align: middle;
+  height: 600px;
+  width: 800px;
+  font-size: 48px;
+  margin-top:100px;
+  margin-bottom:100px;
+}
+*/
+
+
+ol {
+  margin-left: 5pt;
+}
+
+/* Image alignment options. Note that we align centre by default */
+img { display: block; margin: auto; max-width: 600pt; max-height: 340pt;}
+
+section img.align-center, section img.align-centre, section img.center, section img.centre {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+section img.align-right, section img.right {
+  display: block;
+  margin-left: auto;
+  margin-right: 0;
+}
+
+section img.align-left, section img.left {
+  display: block;
+  margin-right: auto;
+  margin-left: 0;
+}
+
+section img.float-right {
+  display: block;
+  float: right;
+  margin-left: auto;
+  margin-right: 0;
+}
+
+section img.float-left {
+  display: block;
+  float: left;
+  margin-right: auto;
+  margin-left: 0;
+}
+
+/* Source and page number */
+aside, footer {
+  display: block;
+  visibility: visible;
+}
+
+aside.source {
+  display: none;
+}
+
+.page_number {
+  position: relative; 
+  text-align: right;
+  display: block !important;
+  visibility: visible !important;
+  top: -40pt;
+  right    : 0px;
+  color    : black !important;
+  padding  : 5pt !important;  
+}
+
+
+#toc, #help, .slide .notes,
+.presenter_notes, #current_presenter_notes, #presenter_note,
+ #time {
+  display: none;
+}
+
+
+/* Turn of page numbers by uncommenting this */
+.page_number {
+  display: none !important;
+}
+
+/* Custom CSS bits */
+.credits {
+    float: right; 
+    text-align:left;
+    padding-top: 150pt !important;
+}
+
+.columnlist2 ul {
+    vertical-align: top;
+    -moz-column-count: 2;
+    -moz-column-gap: 20px;
+    -webkit-column-count: 2;
+    -webkit-column-gap: 20px;
+    column-count: 2;
+    column-gap: 20px;
+}
+
+.columnlist3 ul {
+    vertical-align: top;
+    -moz-column-count: 3;
+    -moz-column-gap: 20px;
+    -webkit-column-count: 3;
+    -webkit-column-gap: 20px;
+    column-count: 3;
+    column-gap: 20px;
+}
+
+    </style>
+    <style type="text/css" media="screen, projection">
+      /***************************************************************************/
+/* The bits that you probably want to override! */
+body {
+    font-size: 36px;
+    font-family: "Helvetica", "Arial", "Liberation Sans", sans-serif;
+    color: black;
+    background-color: #333; /* Colour outside of slide */
+}
+
+div.presentation, div.slide {
+  background-color: white; /* colour of the slide */
+}
+
+div.slide h1, div.slide h2, div.slide h3, div.slide h4, div.slide h5, div.slide h6 {
+  color: navy;
+  font-weight: normal;
+}
+
+pre {
+  font-size: 26px;
+  font-family: Monaco, Courier, monospace;
+}
+
+li {
+  padding: 10px 0;
+}
+
+table {
+  margin-top: 10px;
+  border-collapse: collapse;
+  width: 100%;
+}
+table th {
+  text-align: left;
+  border-bottom: 1px solid #666;
+}
+table td, table th {
+  padding-left:   10px;
+  padding-right:  10px;
+  padding-top:    4px;
+  padding-bottom: 4px;
+}
+tr > td:first-child, tr > th:first-child {
+  padding-left: 0;
+}
+
+/* .notes are displayed when you press '2' */
+.notes {
+  color: white;
+  background: #777;
+  opacity:0.90;
+}
+
+/* A title slide is a single header */
+.slide header:only-child h1 {
+  font-weight: bold;
+  font-size: 80px;
+}
+
+/* Source and page number */
+aside.source, aside.page_number {
+  font-size: 20px;
+}
+
+/* Quote and blockquote */
+blockquote          { text-indent: -1ex; margin-bottom: 10px;}
+blockquote *        { quotes: none; }
+blockquote p:before { content: '\201C'; }
+blockquote p:after  { content: '\201D'; }
+blockquote p        { margin:0; padding:0; }
+blockquote q:before { content: '\2018'; }
+blockquote q:after  { content: '\2019'; }
+.cite { margin:0; text-align:right; margin-right: 40px;}
+
+/***************************************************************************/
+/* Specific clases for use with the .fx: macro */
+
+/* smaller and larger */
+.smaller section {
+  font-size: 30px;
+}
+
+.smaller div h1 {
+  font-size: 72px;
+}
+
+.smaller section pre {
+  font-size: 24px;
+}
+
+.larger section {
+  font-size: 42px;
+}
+
+.larger div h1 {
+  font-size: 72px;
+}
+
+.larger section pre {
+  font-size: 28px;
+}
+
+/* titleslide: displaying a title(h1) and subtitle(h2) on the same slide */
+div.titleslide { text-align: center; }
+div.titleslide h1 { padding-top: 140px; font-size: 80px; font-weight: bold;}
+
+/* imageslide: covering a whole slide with an image */
+div.slides div.imageslide {margin: 0; width: 1024px; height: 768px;}
+div.imageslide img { 
+  position: absolute; 
+  top: 0; left: 0; 
+  width: 1024px; 
+  max-width: 1024px; max-height: 768px;
+  z-index: 0; 
+}
+
+div.imageslide h1 { position: absolute; z-index: 3; left: 40px; top: 0; }
+
+/* black and white header for use with imageslide */
+div.whiteheading h1 {color: white !important;}
+div.blackheading h1 {color: black !important;}
+
+/***************************************************************************/
+/* Syntax highlighting is by Pygments - select via config file */
+.lineno {color: #aaa; }  /* Line numbers */
+
+
+/***************************************************************************/
+/* Slide transition */
+.slide.past {
+  opacity: 0;
+}
+
+.slide.current {
+  opacity: 1;
+  -webkit-transition: opacity 0.75s ease;
+  -moz-transition: opacity 0.75s ease;
+  -o-transition: opacity 0.75s ease;
+  z-index: 100;
+}
+
+.slide.future {
+  opacity: 0;
+}
+
+/***************************************************************************/
+/* The structure - You shouldn't need to change anything from here on down */
+body {
+  padding : 0;
+  margin  : 0;
+  width   : 100%;
+  height  : 100%;
+  overflow: hidden;
+}
+
+div.presentation {
+  margin     : 0px auto;
+  width      : 1024px;
+  height     : 768px;
+  position   : absolute;
+  top        : 50%;
+  left       : 50%;
+  margin-left: -512px;
+  margin-top : -384px;
+}
+
+div.slides {
+  width      : 1024px;
+  height     : 768px;
+}
+
+div.slide {
+  margin-left: 80px; /* Nice big margin */
+  margin-top : 40px;
+  width      : 864px;
+  height     : 688px;
+  position   : absolute;
+  overflow   : hidden;
+  z-index: 0;
+  opacity: 0;
+}
+
+/* A title slide is a single header */
+.slide header:only-child {
+  display: table;
+}
+
+.slide header:only-child h1 {
+  height        : 600px;
+  width         : 864px;
+  text-align    : center;
+  display       : table-cell;
+  vertical-align: middle;
+}
+
+ol {
+  margin-left: 15px;
+}
+
+/* Image alignment options. Note that we align centre by default */
+img { display: block; margin: auto; max-width: 864px; max-height: 500px;}
+
+section img.align-center, section img.align-centre, section img.center, section img.centre {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+section img.align-right, section img.right {
+  display: block;
+  margin-left: auto;
+  margin-right: 0;
+}
+
+section img.align-left, section img.left {
+  display: block;
+  margin-right: auto;
+  margin-left: 0;
+}
+
+section img.float-right {
+  display: block;
+  float: right;
+  margin-left: auto;
+  margin-right: 0;
+}
+
+section img.float-left {
+  display: block;
+  float: left;
+  margin-right: auto;
+  margin-left: 0;
+}
+
+/* Blank screen */
+#blank {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: black;
+  width: 100%;
+  height: 100%;
+  z-index: 64;
+  display: none;
+}
+body.presenter_view.blank .slide.current {
+   opacity: 0.2;
+}
+
+body.presenter_view #blank {
+    display: none !important;
+}
+
+/* Display notes (keyboard: 2) */
+.notes {
+  display   : none;
+  padding   : 30px;
+  color: white;
+  position:absolute;
+  width     : 710px;
+  min-height: 300px;
+  left: 51px;
+  top: 123px;
+  overflow  : hidden;
+}
+
+/* Source and page number */
+aside {
+  display: none;
+}
+aside.source {
+  position: absolute;
+  bottom: 6px;
+  left: 0px;
+}
+aside.page_number {
+  position: absolute;
+  bottom: 6px;
+  right: 0px;
+}
+
+
+/* Expose */
+body.expose div.slides {
+  float           : left;
+  position        : relative;
+  overflow        : auto;
+  margin          : 10px;
+  width           : 1024px;
+  height          : 768px;
+  background-color: #fff !important;
+}
+
+body.expose div.slide {
+  display                 : block;
+  width                   : 864px;
+  height                  : 688px;  
+  float                   : left;
+  position                : relative;
+  left                    : auto !important;
+  top                     : auto !important;
+  margin                  : 0 !important;
+  margin-left             : 10px !important;
+  margin-top              : 10px !important;
+  padding                 : 10px !important;
+  -webkit-transition      : none;
+  -moz-transition         : none;
+  -o-transition           : none;  
+  -moz-transform          : scale(.30, .30);
+  -moz-transform-origin   : 0 0;
+  -webkit-transform       : scale(.30, .30);
+  -webkit-transform-origin: 0 0;
+  -o-transform            : scale(.30, .30);
+  -o-transform-origin     : 0 0;
+  cursor                  : pointer;
+  border                  : 10px solid #ccc;
+  /*background-color        : #eee;*/
+}
+
+body.expose div.slide:hover {
+  /*background-color: #D7FCFC;*/
+  border: 10px solid blue;
+}
+
+body.expose .slide-wrapper {
+  float   : left;
+  position: relative;
+  overflow: hidden;
+  margin  : .5%;
+  width   : 300px;
+  height  : 233px;
+}
+
+body.expose .slide.far-past,
+body.expose .slide.past,
+body.expose .slide.future,
+body.expose .slide.far-future {
+  margin-left: 0;
+  opacity: 1;
+}
+
+body.expose .slide.current {
+  border: 10px solid red;
+  -moz-transform: scale(.30, .30);
+  -moz-transform-origin: 0 0;
+  -webkit-transform: scale(.30, .30);
+  -webkit-transform-origin: 0 0;
+  -o-transform: scale(.30, .30);
+  -o-transform-origin: 0 0;
+}
+
+body.expose .slide aside {
+  display: block;
+}
+body.expose .slide aside.source {
+  display: none;
+}
+body.expose .slide aside.page_number {
+  display         : block;
+  position        : absolute;
+  bottom          : 10px;
+  right           : 10px;
+  font-size       : 40px;
+  background-color: #eee;
+  color           : black;
+  padding         : 10px;
+}
+
+body.expose .slide.current aside.page_number {
+  background-color: red;
+  color: white;
+}
+
+body.expose .slide:hover aside.page_number {
+  background-color: blue;
+  color: white;
+}
+
+/* Sidebar for ToC and Help */
+.sidebar {
+  background-color: #eee;
+  color: #000;
+  border-right: 5px solid #ddd;
+  z-index: 63;
+  height: 100%;
+  overflow: hidden;
+  top: 0;
+  position: absolute;
+  display: block;
+  margin: 0;
+  padding: 10px 16px;
+  overflow: auto;
+  -webkit-transition: margin 0.2s ease-in-out;
+  -moz-transition: margin 0.2s ease-in-out;
+  -o-transition: margin 0.2s ease-in-out;
+  font-size: 14px;
+}
+
+.sidebar.hidden {
+  margin-left: -500px;
+}
+
+.sidebar h2 {
+  margin: 0 0 16px;
+  padding: 0;
+}
+
+.sidebar table {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border-collapse: collapse;
+}
+
+.sidebar table caption {
+  display: none;
+}
+
+.sidebar tr {
+  margin: 2px 0;
+  border-bottom: 1px solid #ccc;
+}
+
+.sidebar th {
+  text-align: left;
+  font-weight: normal;
+  max-width: 300px;
+  overflow: hidden;
+}
+
+.sidebar tr.sub th {
+  text-indent: 20px;
+}
+
+.sidebar td {
+  text-align: right;
+  min-width: 20px;
+}
+
+.sidebar a {
+  color: #000;
+  display: block;
+  text-decoration: none;
+  border-bottom: none;
+  padding: 4px 0;
+}
+
+.sidebar tr.active, .sidebar tr.active:hover, .sidebar tr.active a {
+  background: white;
+}
+
+.sidebar tr:hover {
+  background: #ccc;
+}
+
+/* Presenter Mode */
+body.presenter_view, body.presenter_view div.presentation {
+  background-color: #333 !important;
+}
+body.presenter_view div.slides {
+  margin-left: -40px !important;
+  margin-top : -30px !important;
+}
+
+body.presenter_view div.slide {
+  display: inline;
+  position: absolute;
+  overflow: hidden;
+  -moz-transform: scale(0.55, 0.55);
+  -moz-transform-origin: 0 0;
+  -webkit-transform: scale(0.55, 0.55);
+  -webkit-transform-origin: 0 0;
+  -o-transform: scale(0.55, 0.55);
+  -o-transform-origin: 0 0;
+  opacity: 1;
+  width: 864px !important;
+  height: 688px !important;
+  margin-left: 60px !important;
+  margin-top: 90px !important;
+}
+
+body.presenter_view .slide.far-past {
+  display: none;
+}
+
+body.presenter_view .slide.past {
+  display: none;
+}
+
+body.presenter_view .slide.current {
+  display: block;
+  border: 8px solid maroon;
+  z-index: 2;
+}
+
+body.presenter_view .slide.future {
+  display: block;
+  margin-left: 560px !important;
+  z-index: 1;
+  opacity: 1;
+  margin-top: 90px !important;
+  border: 8px solid #aaa;
+  -moz-transform: scale(0.55, 0.55);
+  -moz-transform-origin: 0 0;
+  -webkit-transform: scale(0.55, 0.55);
+  -webkit-transform-origin: 0 0;
+  -o-transform: scale(0.55, 0.55);
+  -o-transform-origin: 0 0;
+}
+
+body.presenter_view .slide.far-future {
+  display: none;
+  margin-left: 525px;
+}
+
+body.presenter_view div#current_presenter_notes {
+  visibility: visible;
+  display: block;
+  position: absolute;
+  overflow: auto;
+  vertical-align: middle;
+  left: 0;
+  top: 60%;
+  height: 38%;
+  margin-left: 20px;
+  z-index: 2;
+  width: 973px;
+  border: 4px solid #aaa;
+  background-color: #eee;
+}
+
+body.presenter_view div#current_presenter_notes section {
+    background-color: #eee !important;
+}
+
+body.presenter_view .slide aside.page_number {
+  display         : block;
+  position        : absolute;
+  bottom          : 10px;
+  right           : 10px;
+  font-size       : 70px;
+  background-color: #eee;
+  color           : black;
+  padding         : 10px;
+}
+
+body.presenter_view .slide.current aside.page_number {
+  background-color: maroon;
+  color: white;
+}
+
+/* Time display */
+#time { display: none; }
+
+body.presenter_view #time {
+  display: block;
+  color: white;
+  float:right;
+  width: 200px;
+  text-align: right;
+  margin-right: 40px;
+  margin-top: 20px;
+  padding: 0;
+  line-height: 0;
+  font-size: 55px;
+}
+
+body.presenter_view div#current_presenter_notes header {
+  border-bottom: 1px solid #ccc;
+}
+body.presenter_view div#current_presenter_notes header h1 {
+  margin: 5px 10px;
+}
+
+body.presenter_view div#current_presenter_notes section {
+  font-family: "Helvetica", "Arial", "Liberation Sans", sans-serif;
+  font-size: 20px;
+  color: black;
+  display: block;
+  overflow: visible;
+  position: relative;
+  background-color: #fffeff;
+  margin: 0;
+  padding: 10px;
+/*  border: 3px solid blue;*/
+
+}
+
+body.presenter_view div#current_presenter_notes section p {
+  margin: 0;
+}
+
+body.presenter_view div#current_presenter_notes section li {
+  font-size: inherit;
+  padding: 0;
+}
+
+body.presenter_view div#current_presenter_notes h1 {
+  margin-left: 10px;
+  font-size: 20px;
+  display: block;
+
+}
+
+div#current_presenter_notes {
+  display: none;
+}
+
+div.slide div.presenter_notes {
+  display: none;
+}
+
+    </style>
+    
+    
+      
+      <style type="text/css" media="screen, projection">
+        .highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .ch { color: #408080; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .cpf { color: #408080; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mb { color: #666666 } /* Literal.Number.Bin */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+
+      </style>
+      
+    
+      
+      <style type="text/css" media="screen, projection">
+        /* We can customize the theme CSS here */
+
+      </style>
+      
+    
+    <!-- /Styles -->
+    <!-- Javascripts -->
+    
+    <script>
+      function main() {
+    // Since we don't have the fallback of attachEvent and
+    // other IE only stuff we won't try to run JS for IE.
+    // It will run though when using Google Chrome Frame
+    if (document.all) { return; }
+
+    var currentSlideNo;
+    var notesOn = false;
+    var expanded = false;
+    var hiddenContext = false;
+    var blanked = false;
+    var slides = document.getElementsByClassName('slide');
+    var touchStartX = 0;
+    var spaces = /\s+/;
+    var a1 = [''];
+    var tocOpened = false;
+    var helpOpened = false;
+    var overviewActive = false;
+    var modifierKeyDown = false;
+    var scale = 1;
+    var showingPresenterView = false;
+    var presenterViewWin = null;
+    var isPresenterView = false;
+
+    var getSlideEl = function(slideNo) {
+        if (slideNo > 0) {
+            return slides[slideNo - 1];
+        } else {
+            return null;
+        }
+    };
+
+    var getSlideTitle = function(slideNo) {
+        var el = getSlideEl(slideNo);
+        if (el) {
+            var headers = el.getElementsByTagName('header');
+            if (headers.length > 0) {
+                return el.getElementsByTagName('header')[0].innerText;
+            }
+        }
+        return null;
+    };
+
+    var getSlidePresenterNote = function(slideNo) {
+        var el = getSlideEl(slideNo);
+        if (el) {
+            var n = el.getElementsByClassName('presenter_notes');
+            if (n.length > 0) {
+                return n[0];
+            }
+        }
+        return null;
+    };
+
+    var changeSlideElClass = function(slideNo, className) {
+        var el = getSlideEl(slideNo);
+        if (el) {
+            el.classList.remove('far-past', 'past', 'current', 'future', 'far-future');
+            el.classList.add(className);
+        }
+    };
+
+    var updateSlideClasses = function(updateOther) {
+        window.location.hash = (isPresenterView ? "presenter" : "slide") + currentSlideNo;
+
+        for (var i=1; i<currentSlideNo-1; i++) {
+            changeSlideElClass(i, 'far-past');
+        }
+
+        changeSlideElClass(currentSlideNo - 1, 'past');
+        changeSlideElClass(currentSlideNo, 'current');
+        changeSlideElClass(currentSlideNo + 1, 'future');
+
+        for (i=currentSlideNo+2; i<slides.length+1; i++) {
+            changeSlideElClass(i, 'far-future');
+        }
+
+        highlightCurrentTocLink();
+
+        processContext();
+
+        document.getElementsByTagName('title')[0].innerText = getSlideTitle(currentSlideNo);
+
+        updatePresenterNotes();
+
+        if (updateOther) { updateOtherPage(); }
+    };
+
+    var updatePresenterNotes = function() {
+        if (!isPresenterView) { return; }
+
+        var existingNote = document.getElementById('current_presenter_notes');
+        var currentNote = getSlidePresenterNote(currentSlideNo).cloneNode(true);
+        currentNote.setAttribute('id', 'presenter_note');
+
+        existingNote.replaceChild(currentNote, document.getElementById('presenter_note'));
+    };
+
+    var highlightCurrentTocLink = function() {
+        var toc = document.getElementById('toc');
+
+        if (toc) {
+            var tocRows = toc.getElementsByTagName('tr');
+            for (var i=0; i<tocRows.length; i++) {
+                tocRows.item(i).classList.remove('active');
+            }
+
+            var currentTocRow = document.getElementById('toc-row-' + currentSlideNo);
+            if (currentTocRow) {
+                currentTocRow.classList.add('active');
+            }
+        }
+    };
+
+    var updateOtherPage = function() {
+        if (!showingPresenterView) { return; }
+
+        var w = isPresenterView ? window.opener : presenterViewWin;
+        w.postMessage('slide#' + currentSlideNo, '*');
+    };
+
+    var nextSlide = function() {
+        if (currentSlideNo < slides.length) {
+            currentSlideNo++;
+        }
+        updateSlideClasses(true);
+    };
+
+    var prevSlide = function() {
+        if (currentSlideNo > 1) {
+            currentSlideNo--;
+        }
+        updateSlideClasses(true);
+    };
+
+    var showNotes = function() {
+        var notes = getSlideEl(currentSlideNo).getElementsByClassName('notes');
+        for (var i = 0, len = notes.length; i < len; i++) {
+            notes.item(i).style.display = (notesOn) ? 'none':'block';
+        }
+        notesOn = !notesOn;
+    };
+
+    var showSlideNumbers = function() {
+        var asides = document.getElementsByClassName('page_number');
+        var hidden = asides[0].style.display != 'block';
+        for (var i = 0; i < asides.length; i++) {
+            asides.item(i).style.display = hidden ? 'block' : 'none';
+        }
+    };
+
+    var showSlideSources = function() {
+        var asides = document.getElementsByClassName('source');
+        var hidden = asides[0].style.display != 'block';
+        for (var i = 0; i < asides.length; i++) {
+            asides.item(i).style.display = hidden ? 'block' : 'none';
+        }
+    };
+
+    var showToc = function() {
+        if (helpOpened) {
+                showHelp();
+        }
+        var toc = document.getElementById('toc');
+        if (toc) {
+            toc.style.marginLeft = tocOpened ? '-' + (toc.clientWidth + 20) + 'px' : '0px';
+            tocOpened = !tocOpened;
+        }
+        updateOverview();
+    };
+
+    var showHelp = function() {
+        if (tocOpened) {
+                showToc();
+        }
+
+        var help = document.getElementById('help');
+
+        if (help) {
+            help.style.marginLeft = helpOpened ? '-' + (help.clientWidth + 20) + 'px' : '0px';
+            helpOpened = !helpOpened;
+        }
+    };
+
+    var showPresenterView = function() {
+        if (isPresenterView) { return; }
+
+        if (showingPresenterView) {
+            presenterViewWin.close();
+            presenterViewWin = null;
+            showingPresenterView = false;
+        } else {
+            presenterViewWin = open(window.location.pathname + "#presenter" + currentSlideNo, 'presenter_notes',
+                                                                    'directories=no,location=no,toolbar=no,menubar=no,copyhistory=no');
+            showingPresenterView = true;
+        }
+    };
+
+    var setPerspective = function () {
+        document.getElementsByClassName('presentation')[0].style.webkitPerspective = '0';
+    };
+
+    var switch3D = function() {
+        if (document.body.className.indexOf('three-d') == -1) {
+            document.getElementsByClassName('presentation')[0].style.webkitPerspective = '1000px';
+            document.body.className += ' three-d';
+        } else {
+            window.setTimeout(setPerspective, 2000);
+            document.body.className = document.body.className.replace(/three-d/, '');
+        }
+    };
+
+    var toggleFullScreen = function() {
+        if (document.mozFullScreen !== undefined && !document.mozFullScreen) {
+            document.body.mozRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+        } else if (document.webkitIsFullScreen !== undefined && !document.webkitIsFullScreen) {
+            document.body.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+        } else {
+            if (document.webkitCancelFullScreen !== undefined) {
+                document.webkitCancelFullScreen();
+            } else if (document.mozCancelFullScreen !== undefined) {
+                document.mozCancelFullScreen();
+            }
+        }
+    };
+
+    var toggleOverview = function() {
+        if (!overviewActive) {
+            document.body.classList.add('expose');
+            overviewActive = true;
+            setScale(1);
+        } else {
+            document.body.classList.remove('expose');
+            overviewActive = false;
+            if (expanded) {
+                setScale(scale);    // restore scale
+            }
+        }
+        processContext();
+        updateOverview();
+    };
+
+    var updateOverview = function() {
+        var presentation;
+        try {
+            presentation = document.getElementsByClassName('presentation')[0];
+        } catch (e) {
+            return;
+        }
+
+        if (isPresenterView) {
+            if (overviewActive) {
+                document.body.classList.add('presenter_view');
+            } else {
+                document.body.classList.remove('presenter_view');
+            }
+        }
+
+        var toc = document.getElementById('toc');
+
+        if (!toc) {
+            return;
+        }
+
+        if (!tocOpened || !overviewActive) {
+            presentation.style.marginLeft = '-512px';
+        } else {
+            presentation.style.marginLeft = (toc.clientWidth - 512) + 'px';
+        }
+    };
+
+    var computeScale = function() {
+        var cSlide = document.getElementsByClassName('current')[0];
+        var sx = cSlide.clientWidth / window.innerWidth;
+        var sy = cSlide.clientHeight / window.innerHeight;
+        return 1 / Math.max(sx, sy);
+    };
+
+    var setScale = function(scale) {
+        var presentation = document.getElementsByClassName('slides')[0];
+        var transform = 'scale(' + scale + ')';
+        presentation.style.MozTransform = transform;
+        presentation.style.WebkitTransform = transform;
+        presentation.style.OTransform = transform;
+        presentation.style.msTransform = transform;
+        presentation.style.transform = transform;
+    };
+
+    var resizeSlides = function() {
+        if (!expanded) {
+            setScale(1);
+        } else {
+            scale = computeScale();
+            setScale(scale);
+        }
+    };
+
+    var expandSlides = function() {
+        if (overviewActive) {
+            return;
+        }
+        expanded = !expanded;
+        resizeSlides();
+    };
+
+    var showContext = function() {
+        try {
+            var presentation = document.getElementsByClassName('slides')[0];
+            presentation.classList.remove('nocontext');
+        } catch (e) {}
+    };
+
+    var hideContext = function() {
+        try {
+            var presentation = document.getElementsByClassName('slides')[0];
+            presentation.classList.add('nocontext');
+        } catch (e) {}
+    };
+
+    var processContext = function() {
+        if (hiddenContext) {
+            hideContext();
+        } else {
+            showContext();
+        }
+    };
+
+    var toggleContext = function() {
+        hiddenContext = !hiddenContext;
+        processContext();
+    };
+
+    var toggleBlank = function() {
+        blank_elem = document.getElementById('blank');
+
+        blank_elem.style.display = blanked ? 'none' : 'block';
+
+        blanked = !blanked;
+    };
+
+    var isModifierKey = function(keyCode) {
+        switch (keyCode) {
+            case 16: // shift
+            case 17: // ctrl
+            case 18: // alt
+            case 91: // command
+                return true;
+            default:
+                return false;
+        }
+    };
+
+    var checkModifierKeyUp = function(event) {
+        if (isModifierKey(event.keyCode)) {
+            modifierKeyDown = false;
+        }
+    };
+
+    var checkModifierKeyDown = function(event) {
+        if (isModifierKey(event.keyCode)) {
+            modifierKeyDown = true;
+        }
+    };
+
+    var handleBodyKeyDown = function(event) {
+        switch (event.keyCode) {
+            case 13: // Enter
+                if (overviewActive) {
+                    toggleOverview();
+                }
+                break;
+            case 27: // ESC
+                toggleOverview();
+                break;
+            case 37: // left arrow
+            case 33: // page up
+                event.preventDefault();
+                prevSlide();
+                break;
+            case 39: // right arrow
+            case 32: // space
+            case 34: // page down
+                event.preventDefault();
+                nextSlide();
+                break;
+            case 50: // 2
+                if (!modifierKeyDown) {
+                        showNotes();
+                }
+                break;
+            case 51: // 3
+                if (!modifierKeyDown && !overviewActive) {
+                    switch3D();
+                }
+                break;
+            case 190: // .
+            case 48: // 0
+            case 66: // b
+                if (!modifierKeyDown && !overviewActive) {
+                    toggleBlank();
+                }
+                break;
+            case 67: // c
+                if (!modifierKeyDown && !overviewActive) {
+                    toggleContext();
+                }
+                break;
+            case 69: // e
+                if (!modifierKeyDown && !overviewActive) {
+                    expandSlides();
+                }
+                break;
+            case 70: // f
+                // From http://io-2012-slides.googlecode.com/
+                // Only respect 'f' on body. Don't want to capture keys from an <input>.
+                // Also, ignore browser's fullscreen shortcut (cmd+shift+f) so we don't
+                // get trapped in fullscreen!
+                if (event.target == document.body && !modifierKeyDown) {
+                    toggleFullScreen();
+                }
+                break;
+            case 72: // h
+                showHelp();
+                break;
+            case 78: // n
+                if (!modifierKeyDown && !overviewActive) {
+                    showSlideNumbers();
+                }
+                break;
+            case 80: // p
+                if (!modifierKeyDown && !overviewActive) {
+                    showPresenterView();
+                }
+                break;
+            case 83: // s
+                if (!modifierKeyDown && !overviewActive) {
+                    showSlideSources();
+                }
+                break;
+            case 84: // t
+                showToc();
+                break;
+        }
+    };
+
+    var handleWheel = function(event) {
+        if (tocOpened || helpOpened || overviewActive) {
+            return;
+        }
+
+        var delta = 0;
+
+        if (!event) {
+            event = window.event;
+        }
+
+        if (event.wheelDelta) {
+            delta = event.wheelDelta/120;
+            if (window.opera) delta = -delta;
+        } else if (event.detail) {
+            delta = -event.detail/3;
+        }
+
+        if (delta && delta <0) {
+            nextSlide();
+        } else if (delta) {
+            prevSlide();
+        }
+    };
+
+    var onSlideClick = function (e) {
+        if (overviewActive) {
+            currentSlideNo = this.num;
+            toggleOverview();
+            updateSlideClasses(true);
+            e.preventDefault();
+        }
+        return false;
+    };
+
+    var addSlideClickListeners = function() {
+        for (var i=0; i < slides.length; i++) {
+            var slide = slides.item(i);
+            slide.num = i + 1;
+            slide.addEventListener('click', onSlideClick, true);
+        }
+    };
+
+    var addRemoteWindowControls = function() {
+        window.addEventListener("message", function(e) {
+            if (e.data.indexOf("slide#") != -1) {
+                    currentSlideNo = Number(e.data.replace('slide#', ''));
+                    updateSlideClasses(false);
+            }
+        }, false);
+    };
+
+    var addTouchListeners = function() {
+        document.addEventListener('touchstart', function(e) {
+            touchStartX = e.touches[0].pageX;
+        }, false);
+        document.addEventListener('touchend', function(e) {
+            var pixelsMoved = touchStartX - e.changedTouches[0].pageX;
+            var SWIPE_SIZE = 150;
+            if (pixelsMoved > SWIPE_SIZE) {
+                nextSlide();
+            }
+            else if (pixelsMoved < -SWIPE_SIZE) {
+             prevSlide();
+            }
+        }, false);
+    };
+
+    var onTocClick = function (e) {
+        currentSlideNo = Number(this.attributes.href.value.replace('#slide', ''));
+        updateSlideClasses(true);
+        e.preventDefault();
+    };
+
+    var addTocLinksListeners = function() {
+        var toc = document.getElementById('toc');
+        if (toc) {
+            var tocLinks = toc.getElementsByTagName('a');
+            for (var i=0; i < tocLinks.length; i++) {
+                tocLinks.item(i).addEventListener('click', onTocClick, true);
+            }
+        }
+    };
+
+    var updateTimeElement = function (id, value, pad) {
+        var elem = document.getElementById(id),
+            paddedValue;
+
+        while (elem.firstChild) {
+            elem.removeChild(elem.firstChild);
+        }
+
+        if (pad) {
+            paddedValue = ("0" + value.toString()).slice(-2);
+        } else {
+            paddedValue = value.toString();
+        }
+        elem.appendChild(document.createTextNode(paddedValue));
+    };
+
+    var updateTime = function () {
+        var date = new Date();
+
+        updateTimeElement("hours", date.getHours(), false);
+        updateTimeElement("minutes", date.getMinutes(), true);
+        updateTimeElement("seconds", date.getSeconds(), true);
+    };
+
+    // initialize
+
+    (function() {
+        if (window.location.hash == "") {
+            currentSlideNo = 1;
+        } else if (window.location.hash.indexOf("#presenter") != -1) {
+            currentSlideNo = Number(window.location.hash.replace('#presenter', ''));
+            isPresenterView = true;
+            showingPresenterView = true;
+            presenterViewWin = window;
+            document.body.classList.add('presenter_view');
+            updateTime();
+            window.setInterval(updateTime, 1000);
+        } else {
+            currentSlideNo = Number(window.location.hash.replace('#slide', ''));
+        }
+
+        document.addEventListener('keyup', checkModifierKeyUp, false);
+        document.addEventListener('keydown', handleBodyKeyDown, false);
+        document.addEventListener('keydown', checkModifierKeyDown, false);
+        document.addEventListener('DOMMouseScroll', handleWheel, false);
+
+        window.onmousewheel = document.onmousewheel = handleWheel;
+        window.onresize = resizeSlides;
+
+        for (var i = 0; i < slides.length; i++) {
+            slides[i].classList.add('slide', 'far-future');
+        }
+        updateSlideClasses(false);
+
+        // add support for finger events (filter it by property detection?)
+        addTouchListeners();
+
+        addTocLinksListeners();
+
+        addSlideClickListeners();
+
+        addRemoteWindowControls();
+    })();
+}
+
+    </script>
+    
+    
+    <!-- /Javascripts -->
+</head>
+<body>
+  <div id="blank"></div>
+  <div class="presentation highlight">
+    <div id="time">
+      <span id="hours">00</span>:<span id="minutes">00</span>:<span id="seconds">00</span>
+    </div>            
+    <div id="current_presenter_notes">
+      <div id="presenter_note"></div>
+    </div>
+    <div class="slides">
+      
+      <!-- slide source: kotlinpoet.md -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>Kotlin code generation with kotlinpoet</h1></header>
+            
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="kotlinpoet.md">kotlinpoet.md</a>
+            </aside>
+            
+            <aside class="page_number">
+              1/3
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: kotlinpoet.md -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>Chris Koeberle</h1></header>
+            
+            
+            <section><h1>Bottle Rocket</h1>
+<h3>@kodi</h3></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="kotlinpoet.md">kotlinpoet.md</a>
+            </aside>
+            
+            <aside class="page_number">
+              2/3
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: kotlinpoet.md -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>Sources</h1></header>
+            
+            
+            <section><p>https://bit.ly/cdk-effective-pres</p></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="kotlinpoet.md">kotlinpoet.md</a>
+            </aside>
+            
+            <aside class="page_number">
+              3/3
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+  
+  
+  <div id="toc" class="sidebar hidden">
+    <h2>Table of Contents</h2>
+    <table>
+      <caption>Table of Contents</caption>
+      
+      <tr id="toc-row-1">
+        <th><a href="#slide1">Kotlin code generation with kotlinpoet</a></th>
+        <td><a href="#slide1">1</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-2">
+        <th><a href="#slide2">Chris Koeberle</a></th>
+        <td><a href="#slide2">2</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-3">
+        <th><a href="#slide3">Sources</a></th>
+        <td><a href="#slide3">3</a></td>
+      </tr>
+      
+      
+    </table>
+  </div>
+  
+  <div id="help" class="sidebar hidden">
+    <h2>Help</h2>
+    <table>
+      <caption>Help</caption>
+      <tr>
+        <th>Table of contents</th>
+        <td>t</td>
+      </tr>
+      <tr>
+        <th>Exposé</th>
+        <td>ESC</td>
+      </tr>
+      <tr>
+        <th>Autoscale</th>
+        <td>e</td>
+      </tr>
+      <tr>
+        <th>Full screen slides</th>
+        <td>f</td>
+      </tr>
+      <tr>
+        <th>Presenter view</th>
+        <td>p</td>
+      </tr>
+      <tr>
+        <th>Source files</th>
+        <td>s</td>
+      </tr>
+      <tr>
+        <th>Slide numbers</th>
+        <td>n</td>
+      </tr>
+      <tr>
+        <th>Blank screen</th>
+        <td>b</td>
+      </tr>
+      <tr>
+        <th>Notes</th>
+        <td>2</td>
+      </tr>
+      <tr>
+        <th>Help</th>
+        <td>h</td>
+      </tr>
+    </table>
+  </div>
+  <script>main();</script>
+</body>
+</html>
