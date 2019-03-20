@@ -371,7 +371,7 @@ div.slide h1, div.slide h2, div.slide h3, div.slide h4, div.slide h5, div.slide 
 }
 
 pre {
-  font-size: 26px;
+  font-size: 20px;
   font-family: Monaco, Courier, monospace;
 }
 
@@ -1681,7 +1681,7 @@ div.slide div.presenter_notes {
             </aside>
             
             <aside class="page_number">
-              1/6
+              1/12
             </aside>
           </footer>
         </div>
@@ -1712,7 +1712,7 @@ div.slide div.presenter_notes {
             </aside>
             
             <aside class="page_number">
-              2/6
+              2/12
             </aside>
           </footer>
         </div>
@@ -1746,7 +1746,7 @@ div.slide div.presenter_notes {
             </aside>
             
             <aside class="page_number">
-              3/6
+              3/12
             </aside>
           </footer>
         </div>
@@ -1781,7 +1781,7 @@ div.slide div.presenter_notes {
             </aside>
             
             <aside class="page_number">
-              4/6
+              4/12
             </aside>
           </footer>
         </div>
@@ -1817,7 +1817,129 @@ div.slide div.presenter_notes {
             </aside>
             
             <aside class="page_number">
-              5/6
+              5/12
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: src-kotlinpoet.md -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>A kscript digression</h1></header>
+            
+            
+            <section><ul>
+<li>kscript is a wrapper around kotlinc's ability to run kotlin programs as a script</li>
+<li>It also supports creating a temporary wrapper to pull the program into IntelliJ IDEA</li>
+<li>This is a great way to just noodle around without a lot of setup</li>
+<li>It's also a great way to actually write a command line script!</li>
+</ul></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="src-kotlinpoet.md">src-kotlinpoet.md</a>
+            </aside>
+            
+            <aside class="page_number">
+              6/12
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: src-kotlinpoet.md -->
+      <div class="slide-wrapper">
+        <div class="slide has_code">
+          <div class="inner">
+            
+            <header><h1>Hello, Hello World!</h1></header>
+            
+            
+            <section><p>Let's start by looking at a program to write a Hello, World! program.</p>
+<div class="highlight"><pre><span></span><span class="k">val</span> <span class="py">greeterClass</span> <span class="p">=</span> <span class="n">TypeSpec</span><span class="p">.</span><span class="n">classBuilder</span><span class="p">(</span><span class="s">&quot;Greeter&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">primaryConstructor</span><span class="p">(</span>
+        <span class="n">FunSpec</span><span class="p">.</span><span class="n">constructorBuilder</span><span class="p">()</span>
+            <span class="p">.</span><span class="n">addParameter</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">,</span> <span class="n">String</span><span class="o">::</span><span class="k">class</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">build</span><span class="p">())</span>
+    <span class="p">.</span><span class="n">addProperty</span><span class="p">(</span>
+        <span class="n">PropertySpec</span><span class="p">.</span><span class="n">builder</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">,</span> <span class="n">String</span><span class="o">::</span><span class="k">class</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">initializer</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">build</span><span class="p">())</span>
+    <span class="p">.</span><span class="n">addFunction</span><span class="p">(</span><span class="n">FunSpec</span><span class="p">.</span><span class="n">builder</span><span class="p">(</span><span class="s">&quot;greet&quot;</span><span class="p">)</span>
+        <span class="p">.</span><span class="n">addStatement</span><span class="p">(</span><span class="s">&quot;println(%P)&quot;</span><span class="p">,</span> <span class="s">&quot;Hello, \$name&quot;</span><span class="p">)</span>
+        <span class="p">.</span><span class="n">build</span><span class="p">())</span>
+    <span class="p">.</span><span class="n">build</span><span class="p">()</span>
+</pre></div>
+</section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="src-kotlinpoet.md">src-kotlinpoet.md</a>
+            </aside>
+            
+            <aside class="page_number">
+              7/12
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: src-kotlinpoet.md -->
+      <div class="slide-wrapper">
+        <div class="slide has_code">
+          <div class="inner">
+            
+            <header><h1>Hello, Hello World!</h1></header>
+            
+            
+            <section><div class="highlight"><pre><span></span><span class="k">val</span> <span class="py">file</span> <span class="p">=</span> <span class="n">FileSpec</span><span class="p">.</span><span class="n">builder</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="s">&quot;HelloWorld&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">addType</span><span class="p">(</span> <span class="n">greeterClass</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">addFunction</span><span class="p">(</span><span class="n">FunSpec</span><span class="p">.</span><span class="n">builder</span><span class="p">(</span><span class="s">&quot;main&quot;</span><span class="p">)</span>
+        <span class="p">.</span><span class="n">addParameter</span><span class="p">(</span><span class="s">&quot;args&quot;</span><span class="p">,</span> <span class="n">String</span><span class="o">::</span><span class="k">class</span><span class="p">,</span> <span class="n">KModifier</span><span class="p">.</span><span class="n">VARARG</span><span class="p">)</span>
+        <span class="p">.</span><span class="n">addStatement</span><span class="p">(</span><span class="s">&quot;%N(args[0]).greet()&quot;</span><span class="p">,</span> <span class="n">greeterClass</span><span class="p">)</span>
+        <span class="p">.</span><span class="n">build</span><span class="p">())</span>
+    <span class="p">.</span><span class="n">build</span><span class="p">()</span>
+
+<span class="k">fun</span> <span class="nf">main</span><span class="p">(</span><span class="k">vararg</span> <span class="n">args</span><span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">file</span><span class="p">.</span><span class="n">writeTo</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="k">out</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+</section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="src-kotlinpoet.md">src-kotlinpoet.md</a>
+            </aside>
+            
+            <aside class="page_number">
+              8/12
             </aside>
           </footer>
         </div>
@@ -1839,7 +1961,122 @@ div.slide div.presenter_notes {
           <footer>
             
             <aside class="page_number">
-              /6
+              /12
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: src-kotlinpoet.md -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>But why?</h1></header>
+            
+            
+            <section><p>How is this different from just search and replace?</p>
+<ul>
+<li>Well, this is a weak example.</li>
+<li>The real value comes when we can use this WITH a data source</li>
+</ul></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="src-kotlinpoet.md">src-kotlinpoet.md</a>
+            </aside>
+            
+            <aside class="page_number">
+              9/12
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: src-kotlinpoet.md -->
+      <div class="slide-wrapper">
+        <div class="slide has_code">
+          <div class="inner">
+            
+            <header><h1>A trivial example of a powerful concept</h1></header>
+            
+            
+            <section><p>Here's a trivial class:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Dependency</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">var</span> <span class="py">name</span><span class="p">:</span> <span class="n">String</span> <span class="p">=</span> <span class="s">&quot;&quot;</span>
+    <span class="k">var</span> <span class="py">color</span><span class="p">:</span> <span class="n">String</span> <span class="p">=</span> <span class="s">&quot;&quot;</span>
+    <span class="k">var</span> <span class="py">shape</span><span class="p">:</span> <span class="n">String</span> <span class="p">=</span> <span class="s">&quot;&quot;</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>Let's imagine that this is the representation of this dependency on the server, and it has a whole bunch of implementation in it. We want to just export a data transfer object with these properties.</p></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="src-kotlinpoet.md">src-kotlinpoet.md</a>
+            </aside>
+            
+            <aside class="page_number">
+              10/12
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: src-kotlinpoet.md -->
+      <div class="slide-wrapper">
+        <div class="slide has_code">
+          <div class="inner">
+            
+            <header><h1>A trivial example of a powerful concept</h1></header>
+            
+            
+            <section><div class="highlight"><pre><span></span><span class="k">fun</span> <span class="nf">writeClassInterface</span><span class="p">(</span><span class="n">kClass</span><span class="p">:</span> <span class="n">KClass</span><span class="p">&lt;</span><span class="k">out</span> <span class="n">Any</span><span class="p">&gt;)</span> <span class="p">:</span> <span class="n">String</span> <span class="p">{</span>
+    <span class="k">val</span> <span class="py">name</span> <span class="p">=</span> <span class="n">kClass</span><span class="p">.</span><span class="n">simpleName</span><span class="o">?:</span><span class="s">&quot;anon&quot;</span>
+    <span class="k">val</span> <span class="py">dependencyClass</span> <span class="p">=</span> <span class="n">ClassName</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+    <span class="k">val</span> <span class="py">classTypeBuilder</span> <span class="p">=</span> <span class="n">TypeSpec</span><span class="p">.</span><span class="n">classBuilder</span><span class="p">(</span><span class="n">dependencyClass</span><span class="p">)</span>
+    <span class="k">for</span><span class="p">(</span><span class="n">prop</span> <span class="k">in</span> <span class="n">kClass</span><span class="p">.</span><span class="n">memberProperties</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">classTypeBuilder</span><span class="p">.</span><span class="n">addProperty</span><span class="p">(</span><span class="n">prop</span><span class="p">.</span><span class="n">name</span><span class="p">,</span> <span class="n">prop</span><span class="p">.</span><span class="n">returnType</span><span class="p">.</span><span class="n">asTypeName</span><span class="p">().</span><span class="n">copy</span><span class="p">(</span><span class="k">true</span><span class="p">))</span>
+    <span class="p">}</span>
+    <span class="k">val</span> <span class="py">file</span> <span class="p">=</span> <span class="n">FileSpec</span><span class="p">.</span><span class="n">builder</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="p">.</span><span class="n">addType</span><span class="p">(</span><span class="n">classTypeBuilder</span><span class="p">.</span><span class="n">build</span><span class="p">())</span>
+        <span class="p">.</span><span class="n">build</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">file</span><span class="p">.</span><span class="n">toString</span><span class="p">()</span>
+<span class="p">}</span>
+</pre></div>
+</section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="src-kotlinpoet.md">src-kotlinpoet.md</a>
+            </aside>
+            
+            <aside class="page_number">
+              11/12
             </aside>
           </footer>
         </div>
@@ -1869,7 +2106,7 @@ div.slide div.presenter_notes {
             </aside>
             
             <aside class="page_number">
-              6/6
+              12/12
             </aside>
           </footer>
         </div>
@@ -1915,8 +2152,44 @@ div.slide div.presenter_notes {
       
       
       <tr id="toc-row-6">
-        <th><a href="#slide6">Sources</a></th>
+        <th><a href="#slide6">A kscript digression</a></th>
         <td><a href="#slide6">6</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-7">
+        <th><a href="#slide7">Hello, Hello World!</a></th>
+        <td><a href="#slide7">7</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-8">
+        <th><a href="#slide8">Hello, Hello World!</a></th>
+        <td><a href="#slide8">8</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-9">
+        <th><a href="#slide9">But why?</a></th>
+        <td><a href="#slide9">9</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-10">
+        <th><a href="#slide10">A trivial example of a powerful concept</a></th>
+        <td><a href="#slide10">10</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-11">
+        <th><a href="#slide11">A trivial example of a powerful concept</a></th>
+        <td><a href="#slide11">11</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-12">
+        <th><a href="#slide12">Sources</a></th>
+        <td><a href="#slide12">12</a></td>
       </tr>
       
       
