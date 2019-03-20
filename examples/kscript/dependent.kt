@@ -1,33 +1,29 @@
 //DEPS com.squareup:kotlinpoet:1.1.0
 
 import com.squareup.kotlinpoet.*
+import kotlin.reflect.KClass
+import kotlin.reflect.full.memberProperties
+
 
 class Dependency() {
-    var name: String
-    var color: String
-    var shape: String
+    var name: String=""
+    var color: String=""
+    var shape: String=""
 }
 
-val dependencyClass = ClassName("", Dependency::class.simpleName)
-val file = FileSpec.builder("", "HelloWorld")
-    .addType(TypeSpec.classBuilder("Greeter")
-        .primaryConstructor(FunSpec.constructorBuilder()
-            .addParameter("name", String::class)
-            .build())
-        .addProperty(PropertySpec.builder("name", String::class)
-            .initializer("name")
-            .build())
-        .addFunction(FunSpec.builder("greet")
-            .addStatement("println(%P)", "Hello, \$name")
-            .build())
-        .build())
-    .addFunction(FunSpec.builder("main")
-        .addParameter("args", String::class, VARARG)
-        .addStatement("%T(args[0]).greet()", greeterClass)
-        .build())
-    .build()
-
+fun writeClassInterface(kClass: KClass<out Any>) : String {
+    val name = kClass.simpleName?:"anon"
+    val dependencyClass = ClassName("", name)
+    val classTypeBuilder = TypeSpec.classBuilder(dependencyClass)
+    for(prop in kClass.memberProperties) {
+        classTypeBuilder.addProperty(prop.name, prop.returnType.asTypeName().copy(true))
+    }
+    val file = FileSpec.builder("", name)
+        .addType(classTypeBuilder.build())
+        .build()
+    return file.toString()
+}
 
 fun main(vararg args: String) {
-file.writeTo(System.out)
+    System.out.println(writeClassInterface(Dependency::class))
 }
