@@ -17,7 +17,7 @@ A library from Square for writing Kotlin programs that have Kotlin source as out
 
 ---
 
-# Why kotlinpoet?
+# Why is kotlinpoet?
 
 * IDE Plugins
 * Create boilerplate based on data files
@@ -26,7 +26,7 @@ A library from Square for writing Kotlin programs that have Kotlin source as out
 
 ---
 
-# Where kotlinpoet?
+# Where is kotlinpoet?
 
 <https://github.com/square/kotlinpoet>
 
@@ -86,6 +86,40 @@ Let's start by looking at a program to write a Hello, World! program.
 
 ---
 
+# How is kotlinpoet?
+
+    !kotlin
+    val greeterClass = TypeSpec.classBuilder("Greeter")
+
+If we don't have an example of a class, use a TypeSpec to tell kotlinpoet about the class
+
+    !kotlin
+        .addParameter("name", String::class)
+
+If we have the actual class available, we can just hand it to kotlinpoet. 
+If we didn't we could create it with a classBuilder
+
+---
+
+# How is kotlinpoet?
+
+    !kotlin
+    FunSpec.constructorBuilder()
+
+Functions, including constructors, are built with FunSpecs
+
+    !kotlin
+        .build())
+ 
+Now we have a function!
+
+    !kotlin
+    .addFunction(FunSpec.builder("greet")
+        .addStatement("println(%P)", "Hello, \$name")
+        .build())
+ 
+This will build a function with a body
+
 ---
 
 # But why?
@@ -127,6 +161,19 @@ Let's imagine that this is the representation of this dependency on the server, 
             .build()
         return file.toString()
     }
+
+---
+
+# Now let's make some changes!
+
+    !kotlin
+    //TODO: Link to a video
+
+---
+
+# A real-world example
+
+<https://github.com/politedog/invision>
 
 ---
 

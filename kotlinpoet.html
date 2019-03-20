@@ -1681,7 +1681,7 @@ div.slide div.presenter_notes {
             </aside>
             
             <aside class="page_number">
-              1/12
+              1/16
             </aside>
           </footer>
         </div>
@@ -1712,7 +1712,7 @@ div.slide div.presenter_notes {
             </aside>
             
             <aside class="page_number">
-              2/12
+              2/16
             </aside>
           </footer>
         </div>
@@ -1746,7 +1746,7 @@ div.slide div.presenter_notes {
             </aside>
             
             <aside class="page_number">
-              3/12
+              3/16
             </aside>
           </footer>
         </div>
@@ -1757,7 +1757,7 @@ div.slide div.presenter_notes {
         <div class="slide">
           <div class="inner">
             
-            <header><h1>Why kotlinpoet?</h1></header>
+            <header><h1>Why is kotlinpoet?</h1></header>
             
             
             <section><ul>
@@ -1781,7 +1781,7 @@ div.slide div.presenter_notes {
             </aside>
             
             <aside class="page_number">
-              4/12
+              4/16
             </aside>
           </footer>
         </div>
@@ -1792,7 +1792,7 @@ div.slide div.presenter_notes {
         <div class="slide">
           <div class="inner">
             
-            <header><h1>Where kotlinpoet?</h1></header>
+            <header><h1>Where is kotlinpoet?</h1></header>
             
             
             <section><p><a href="https://github.com/square/kotlinpoet">https://github.com/square/kotlinpoet</a></p>
@@ -1817,7 +1817,7 @@ div.slide div.presenter_notes {
             </aside>
             
             <aside class="page_number">
-              5/12
+              5/16
             </aside>
           </footer>
         </div>
@@ -1852,7 +1852,7 @@ div.slide div.presenter_notes {
             </aside>
             
             <aside class="page_number">
-              6/12
+              6/16
             </aside>
           </footer>
         </div>
@@ -1897,7 +1897,7 @@ div.slide div.presenter_notes {
             </aside>
             
             <aside class="page_number">
-              7/12
+              7/16
             </aside>
           </footer>
         </div>
@@ -1939,17 +1939,29 @@ div.slide div.presenter_notes {
             </aside>
             
             <aside class="page_number">
-              8/12
+              8/16
             </aside>
           </footer>
         </div>
       </div>
       
-      <!-- slide source:  -->
+      <!-- slide source: src-kotlinpoet.md -->
       <div class="slide-wrapper">
-        <div class="slide">
+        <div class="slide has_code">
           <div class="inner">
             
+            <header><h1>How is kotlinpoet?</h1></header>
+            
+            
+            <section><div class="highlight"><pre><span></span><span class="k">val</span> <span class="py">greeterClass</span> <span class="p">=</span> <span class="n">TypeSpec</span><span class="p">.</span><span class="n">classBuilder</span><span class="p">(</span><span class="s">&quot;Greeter&quot;</span><span class="p">)</span>
+</pre></div>
+
+<p>If we don't have an example of a class, use a TypeSpec to tell kotlinpoet about the class</p>
+<div class="highlight"><pre><span></span>    <span class="p">.</span><span class="n">addParameter</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">,</span> <span class="n">String</span><span class="o">::</span><span class="k">class</span><span class="p">)</span>
+</pre></div>
+
+<p>If we have the actual class available, we can just hand it to kotlinpoet. 
+If we didn't we could create it with a classBuilder</p></section>
             
           </div>
           <div class="presenter_notes">
@@ -1960,8 +1972,55 @@ div.slide div.presenter_notes {
           </div>
           <footer>
             
+            <aside class="source">
+              Source: <a href="src-kotlinpoet.md">src-kotlinpoet.md</a>
+            </aside>
+            
             <aside class="page_number">
-              /12
+              9/16
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: src-kotlinpoet.md -->
+      <div class="slide-wrapper">
+        <div class="slide has_code">
+          <div class="inner">
+            
+            <header><h1>How is kotlinpoet?</h1></header>
+            
+            
+            <section><div class="highlight"><pre><span></span><span class="n">FunSpec</span><span class="p">.</span><span class="n">constructorBuilder</span><span class="p">()</span>
+</pre></div>
+
+<p>Functions, including constructors, are built with FunSpecs</p>
+<div class="highlight"><pre><span></span>    <span class="p">.</span><span class="n">build</span><span class="p">())</span>
+</pre></div>
+
+<p>Now we have a function!</p>
+<div class="highlight"><pre><span></span><span class="p">.</span><span class="n">addFunction</span><span class="p">(</span><span class="n">FunSpec</span><span class="p">.</span><span class="n">builder</span><span class="p">(</span><span class="s">&quot;greet&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">addStatement</span><span class="p">(</span><span class="s">&quot;println(%P)&quot;</span><span class="p">,</span> <span class="s">&quot;Hello, \$name&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">build</span><span class="p">())</span>
+</pre></div>
+
+<p>This will build a function with a body</p></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="src-kotlinpoet.md">src-kotlinpoet.md</a>
+            </aside>
+            
+            <aside class="page_number">
+              10/16
             </aside>
           </footer>
         </div>
@@ -1995,7 +2054,7 @@ div.slide div.presenter_notes {
             </aside>
             
             <aside class="page_number">
-              9/12
+              11/16
             </aside>
           </footer>
         </div>
@@ -2033,7 +2092,7 @@ div.slide div.presenter_notes {
             </aside>
             
             <aside class="page_number">
-              10/12
+              12/16
             </aside>
           </footer>
         </div>
@@ -2076,7 +2135,69 @@ div.slide div.presenter_notes {
             </aside>
             
             <aside class="page_number">
-              11/12
+              13/16
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: src-kotlinpoet.md -->
+      <div class="slide-wrapper">
+        <div class="slide has_code">
+          <div class="inner">
+            
+            <header><h1>Now let's make some changes!</h1></header>
+            
+            
+            <section><div class="highlight"><pre><span></span><span class="c1">//TODO: Link to a video</span>
+</pre></div>
+</section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="src-kotlinpoet.md">src-kotlinpoet.md</a>
+            </aside>
+            
+            <aside class="page_number">
+              14/16
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: src-kotlinpoet.md -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>A real-world example</h1></header>
+            
+            
+            <section><p><a href="https://github.com/politedog/invision">https://github.com/politedog/invision</a></p></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="src-kotlinpoet.md">src-kotlinpoet.md</a>
+            </aside>
+            
+            <aside class="page_number">
+              15/16
             </aside>
           </footer>
         </div>
@@ -2106,7 +2227,7 @@ div.slide div.presenter_notes {
             </aside>
             
             <aside class="page_number">
-              12/12
+              16/16
             </aside>
           </footer>
         </div>
@@ -2140,13 +2261,13 @@ div.slide div.presenter_notes {
       
       
       <tr id="toc-row-4">
-        <th><a href="#slide4">Why kotlinpoet?</a></th>
+        <th><a href="#slide4">Why is kotlinpoet?</a></th>
         <td><a href="#slide4">4</a></td>
       </tr>
       
       
       <tr id="toc-row-5">
-        <th><a href="#slide5">Where kotlinpoet?</a></th>
+        <th><a href="#slide5">Where is kotlinpoet?</a></th>
         <td><a href="#slide5">5</a></td>
       </tr>
       
@@ -2170,26 +2291,50 @@ div.slide div.presenter_notes {
       
       
       <tr id="toc-row-9">
-        <th><a href="#slide9">But why?</a></th>
+        <th><a href="#slide9">How is kotlinpoet?</a></th>
         <td><a href="#slide9">9</a></td>
       </tr>
       
       
       <tr id="toc-row-10">
-        <th><a href="#slide10">A trivial example of a powerful concept</a></th>
+        <th><a href="#slide10">How is kotlinpoet?</a></th>
         <td><a href="#slide10">10</a></td>
       </tr>
       
       
       <tr id="toc-row-11">
-        <th><a href="#slide11">A trivial example of a powerful concept</a></th>
+        <th><a href="#slide11">But why?</a></th>
         <td><a href="#slide11">11</a></td>
       </tr>
       
       
       <tr id="toc-row-12">
-        <th><a href="#slide12">Sources</a></th>
+        <th><a href="#slide12">A trivial example of a powerful concept</a></th>
         <td><a href="#slide12">12</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-13">
+        <th><a href="#slide13">A trivial example of a powerful concept</a></th>
+        <td><a href="#slide13">13</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-14">
+        <th><a href="#slide14">Now let's make some changes!</a></th>
+        <td><a href="#slide14">14</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-15">
+        <th><a href="#slide15">A real-world example</a></th>
+        <td><a href="#slide15">15</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-16">
+        <th><a href="#slide16">Sources</a></th>
+        <td><a href="#slide16">16</a></td>
       </tr>
       
       
